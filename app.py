@@ -21,19 +21,36 @@ if len(sys.argv) > 1:
         sys.exit(1)
 else:
     # Default to analog/HDZero narrow mode
+    bandwidth_mode = 'analog'
     channel_width = 17
-    print(f"Using default analog/HDZero-narrow mode with {channel_width} MHz bandwidth")
+    print(f"Using default analog mode with {channel_width} MHz bandwidth")
     print(f"Usage: python app.py [mode]")
     print(f"Available modes: {', '.join(BANDWIDTH_OPTIONS.keys())}")
 
 # FPV Band Frequencies (in MHz) with channel numbers
-fpv_bands = {
+# 全チャンネル定義（アナログ用）
+fpv_bands_analog = {
     'R': [(5658, 1), (5695, 2), (5732, 3), (5769, 4), (5806, 5), (5843, 6), (5880, 7), (5917, 8)],  # Raceband
     'F': [(5740, 1), (5760, 2), (5780, 3), (5800, 4), (5820, 5), (5840, 6), (5860, 7), (5880, 8)],  # Fatshark
     'A': [(5865, 1), (5845, 2), (5825, 3), (5805, 4), (5785, 5), (5765, 6), (5745, 7), (5725, 8)],  # Boscam A
     'B': [(5733, 1), (5752, 2), (5771, 3), (5790, 4), (5809, 5), (5828, 6), (5847, 7), (5866, 8)],  # Boscam B
     'E': [(5705, 1), (5685, 2), (5665, 3), (5645, 4), (5885, 5), (5905, 6), (5925, 7), (5945, 8)],  # Band E
 }
+
+# HDZero用チャンネル定義（R全部、Fの1,4、Eの1のみ）
+fpv_bands_hdzero = {
+    'R': [(5658, 1), (5695, 2), (5732, 3), (5769, 4), (5806, 5), (5843, 6), (5880, 7), (5917, 8)],  # Raceband全部
+    'F': [(5740, 1), (5800, 4)],  # Fatsharkの1と4のみ
+    'E': [(5705, 1)],  # Band Eの1のみ
+}
+
+# 実行モードに応じてFPVバンドテーブルを選択
+if bandwidth_mode in ['hdzero', 'hdzero-narrow']:
+    fpv_bands = fpv_bands_hdzero
+    print(f"Using HDZero channel configuration: R(1-8), F(1,4), E(1)")
+else:
+    fpv_bands = fpv_bands_analog
+    print(f"Using analog channel configuration: All bands and channels")
 
 # Define the range we want to use
 min_freq = 5670
