@@ -123,15 +123,17 @@ for band_name, band_data in fpv_bands.items():
             freq_to_band_ch[freq] = []
         freq_to_band_ch[freq].append((band_name, ch))
 
-# display top 10 ratings
-print("\nTop 10 FPV frequency combinations:")
+# display top 10 ratings with comparison to legacy
+print("\nTop 10 FPV frequency combinations (Enhanced IMD Analysis):")
+print("Note: Enhanced and Legacy ratings use different calculation methods and cannot be directly compared.")
 for i, (rating, combination) in enumerate(ratings[:10], 1):
     band_info = []
+    legacy_rating = imd.calcRating_legacy(combination)
     for freq in combination:
         band_ch_list = freq_to_band_ch.get(freq, [('?', '?')])
         band_ch_str = '/'.join([f"{b}{ch}" for b, ch in band_ch_list])
         band_info.append(f"{freq}MHz({band_ch_str})")
-    print(f"{i}. Rating: {rating} - {', '.join(band_info)}")
+    print(f"{i}. Rating: {rating} (Legacy: {legacy_rating}) - {', '.join(band_info)}")
 
 # Display as table
 print("\n" + "="*80)
@@ -147,7 +149,7 @@ for i, (rating, combination) in enumerate(ratings[:10], 1):
 print("="*80)
 
 
-def drawResults(results):
+def drawResults(results, show_imd=False):
     import matplotlib.pyplot as plt
 
     # Create frequency to band/channel mapping
@@ -202,6 +204,29 @@ def drawResults(results):
         # Add rating on the left side
         plt.text(min_freq - 8, plot_index, f"Rating: {rating}", ha="right", va="center", 
                 fontsize=10, weight="bold")
+        
+        # Optionally show IMD products for this combination
+        if show_imd and i == 0:  # Only show for the best combination
+            imd_details = imd.analyze_imd_details(combination)
+            imd_colors = {
+                '2nd_order': 'red',
+                '3rd_order_2freq': 'orange', 
+                '3rd_order_3freq': 'yellow'
+            }
+            
+            # Plot significant IMD products
+            for imd_type, products in imd_details.items():
+                for p in products:
+                    if p['interference_score'] > 0 and min_freq <= p['imd_freq'] <= max_freq:
+                        # Draw vertical line for IMD product
+                        plt.axvline(x=p['imd_freq'], ymin=(plot_index-0.4)/len(results), 
+                                   ymax=(plot_index+0.4)/len(results),
+                                   color=imd_colors[imd_type], alpha=0.7, linewidth=2,
+                                   linestyle='--')
+                        # Add small text label
+                        plt.text(p['imd_freq'], plot_index - 0.6, 'IMD', 
+                                ha='center', va='top', fontsize=6,
+                                color=imd_colors[imd_type], weight='bold')
 
     # Add grid and labels
     plt.xlabel("Frequency (MHz)")
@@ -217,9 +242,58 @@ def drawResults(results):
     plt.text(min_freq, len(results) - 0.5, f'{min_freq} MHz', rotation=90, va='bottom', ha='right')
     plt.text(max_freq, len(results) - 0.5, f'{max_freq} MHz', rotation=90, va='bottom', ha='left')
 
+    # Add IMD legend if showing IMD
+    if show_imd:
+        from matplotlib.patches import Patch
+        imd_legend_elements = [
+            Patch(facecolor='red', alpha=0.7, label='2nd Order IMD'),
+            Patch(facecolor='orange', alpha=0.7, label='3rd Order IMD (2-freq)'),
+            Patch(facecolor='yellow', alpha=0.7, label='3rd Order IMD (3-freq)')
+        ]
+        plt.legend(handles=imd_legend_elements, loc='upper right')
+
     # Display the plot
     plt.tight_layout()
     plt.show()
 
 
+# Show detailed IMD analysis for the best combination
+print("\nDetailed IMD Analysis for Best Combination:")
+best_combination = ratings[0][1]
+imd_details = imd.analyze_imd_details(best_combination)
+
+print(f"Frequencies: {best_combination}")
+print(f"Enhanced Rating: {ratings[0][0]}, Legacy Rating: {imd.calcRating_legacy(best_combination)}")
+
+# Count significant IMD products
+significant_imd_count = {
+    '2nd_order': sum(1 for p in imd_details['2nd_order'] if p['interference_score'] > 0),
+    '3rd_order_2freq': sum(1 for p in imd_details['3rd_order_2freq'] if p['interference_score'] > 0),
+    '3rd_order_3freq': sum(1 for p in imd_details['3rd_order_3freq'] if p['interference_score'] > 0)
+}
+
+print(f"\nSignificant IMD products:")
+print(f"  2nd order: {significant_imd_count['2nd_order']}")
+print(f"  3rd order (2-freq): {significant_imd_count['3rd_order_2freq']}")
+print(f"  3rd order (3-freq): {significant_imd_count['3rd_order_3freq']}")
+
+# Show worst interference cases
+all_imd = []
+for imd_type, products in imd_details.items():
+    for p in products:
+        if p['interference_score'] > 0:
+            all_imd.append((p['interference_score'], imd_type, p))
+
+all_imd.sort(key=lambda x: x[0], reverse=True)
+print(f"\nWorst 5 interference cases:")
+for score, imd_type, product in all_imd[:5]:
+    print(f"  {product['formula']} = {product['imd_freq']} MHz")
+    print(f"    Type: {imd_type.replace('_', ' ').title()}")
+    print(f"    Separation: {product['separation']} MHz, Score: {score:.2f}")
+
+# Draw standard results
 drawResults(ratings[:10])
+
+# Draw results with IMD visualization for the best combination
+print("\nGenerating visualization with IMD products...")
+drawResults(ratings[:1], show_imd=True)
