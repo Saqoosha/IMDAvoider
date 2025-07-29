@@ -57,23 +57,70 @@ def calculate_3rd_order_imd_2freq(f1: int, f2: int):
 def calculate_3rd_order_imd_3freq(f1: int, f2: int, f3: int):
     """Calculate 3rd order IMD products for 3 frequencies
     Returns: list of IMD products that fall within valid frequency range
+    
+    All 10 patterns from IMDAvoider3:
+    1. f1 - f2 + f3
+    2. f1 + f2 - f3  
+    3. 2*f1 - f2 - f3
+    4. f1 + f2 + f3
+    5. -f1 + f2 + f3
+    6. 2*f1 + f2 - f3
+    7. 2*f1 - f2 + f3
+    8. f1 - 2*f2 + f3
+    9. f1 + 2*f2 - f3
+    10. -f1 + 2*f2 + f3
     """
     imd_products = []
     
-    # Type A: f1 + f2 - f3
-    imd_a = f1 + f2 - f3
-    if isValidFrequency(imd_a):
-        imd_products.append(imd_a)
+    # Pattern 1: f1 - f2 + f3
+    imd = f1 - f2 + f3
+    if isValidFrequency(imd):
+        imd_products.append(imd)
     
-    # Type B: f1 - f2 + f3
-    imd_b = f1 - f2 + f3
-    if isValidFrequency(imd_b):
-        imd_products.append(imd_b)
+    # Pattern 2: f1 + f2 - f3
+    imd = f1 + f2 - f3
+    if isValidFrequency(imd):
+        imd_products.append(imd)
     
-    # Type C: -f1 + f2 + f3
-    imd_c = -f1 + f2 + f3
-    if isValidFrequency(imd_c):
-        imd_products.append(imd_c)
+    # Pattern 3: 2*f1 - f2 - f3
+    imd = 2 * f1 - f2 - f3
+    if isValidFrequency(imd):
+        imd_products.append(imd)
+    
+    # Pattern 4: f1 + f2 + f3
+    imd = f1 + f2 + f3
+    if isValidFrequency(imd):
+        imd_products.append(imd)
+    
+    # Pattern 5: -f1 + f2 + f3
+    imd = -f1 + f2 + f3
+    if isValidFrequency(imd):
+        imd_products.append(imd)
+    
+    # Pattern 6: 2*f1 + f2 - f3
+    imd = 2 * f1 + f2 - f3
+    if isValidFrequency(imd):
+        imd_products.append(imd)
+    
+    # Pattern 7: 2*f1 - f2 + f3
+    imd = 2 * f1 - f2 + f3
+    if isValidFrequency(imd):
+        imd_products.append(imd)
+    
+    # Pattern 8: f1 - 2*f2 + f3
+    imd = f1 - 2 * f2 + f3
+    if isValidFrequency(imd):
+        imd_products.append(imd)
+    
+    # Pattern 9: f1 + 2*f2 - f3
+    imd = f1 + 2 * f2 - f3
+    if isValidFrequency(imd):
+        imd_products.append(imd)
+    
+    # Pattern 10: -f1 + 2*f2 + f3
+    imd = -f1 + 2 * f2 + f3
+    if isValidFrequency(imd):
+        imd_products.append(imd)
     
     return imd_products
 

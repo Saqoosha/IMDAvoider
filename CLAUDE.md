@@ -12,9 +12,9 @@ This is a frequency segment optimization tool for drone avoidance systems (IMD -
 
 1. **imd.py** - Enhanced IMD rating calculation module
    - Calculates intermodulation distortion ratings with multiple IMD orders:
-     - 2nd order IMD: 2*f1 - f2
-     - 3rd order IMD (2-freq): 2*f2 - f1, f1 + 2*f2, 2*f1 + f2
-     - 3rd order IMD (3-freq): f1 + f2 - f3, f1 - f2 + f3, -f1 + f2 + f3
+     - 2nd order IMD: 2*f1 - f2 (1 pattern)
+     - 3rd order IMD (2-freq): 2*f2 - f1, f1 + 2*f2, 2*f1 + f2 (3 patterns)
+     - 3rd order IMD (3-freq): All 10 patterns including f1 + f2 - f3, f1 - f2 + f3, -f1 + f2 + f3, etc.
    - Weighted scoring system based on relative signal strengths:
      - 2nd order: weight = 1.0 (reference)
      - 3rd order (2-freq): weight = 0.1 (-20dB)
@@ -113,8 +113,11 @@ python3 app.py
 
 3. **calculate_3rd_order_imd_3freq(f1, f2, f3)**
    - Returns 3-frequency interaction products
-   - Products: f1 + f2 - f3, f1 - f2 + f3, -f1 + f2 + f3
+   - Implements all 10 IMDAvoider3 patterns:
+     - Pattern 1-3: f1±f2±f3 combinations
+     - Pattern 4-10: 2*f1±f2±f3 and f1±2*f2±f3 combinations
    - Critical for multi-transmitter scenarios
+   - Mathematically 16 patterns exist, but 6 generate negative/out-of-band frequencies
 
 4. **calculate_weighted_interference(imd_freq, frequencies, weight, threshold)**
    - Calculates interference score for a single IMD product
@@ -130,8 +133,10 @@ python3 app.py
 ### Research Background
 
 Detailed academic research supporting the implementation is documented in:
-- [English Version](IMD_Research_Document.md)
-- [Japanese Version](IMD_Research_Document_JP.md)
+- [English Version](docs/IMD_Research_Document.md)
+- [Japanese Version](docs/IMD_Research_Document_JP.md)
+- [3rd Order IMD Theory](docs/3rd_order_imd_theory.md)
+- [IMDAvoider3 Comparison](docs/IMDAvoider3_Comparison.md)
 
 Key findings:
 - 3rd order products typically -20 to -30 dB below fundamentals

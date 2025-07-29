@@ -150,9 +150,20 @@ Our algorithm calculates:
    - Threshold: 25 MHz
 
 3. **3rd Order IMD (3-frequency)**
-   - Formulas: f₁ + f₂ - f₃, f₁ - f₂ + f₃, -f₁ + f₂ + f₃
+   - 10 Formulas implemented:
+     - Pattern 1: f₁ - f₂ + f₃
+     - Pattern 2: f₁ + f₂ - f₃
+     - Pattern 3: 2×f₁ - f₂ - f₃
+     - Pattern 4: f₁ + f₂ + f₃
+     - Pattern 5: -f₁ + f₂ + f₃
+     - Pattern 6: 2×f₁ + f₂ - f₃
+     - Pattern 7: 2×f₁ - f₂ + f₃
+     - Pattern 8: f₁ - 2×f₂ + f₃
+     - Pattern 9: f₁ + 2×f₂ - f₃
+     - Pattern 10: -f₁ + 2×f₂ + f₃
    - Weight: 0.03 (-30 dB)
    - Threshold: 25 MHz
+   - Note: Mathematically 16 patterns exist, but 6 generate negative or out-of-band frequencies
 
 ## Important Note on Rating Comparison
 
