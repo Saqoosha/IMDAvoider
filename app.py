@@ -53,7 +53,7 @@ else:
     print(f"Using analog channel configuration: All bands and channels")
 
 # Define the range we want to use
-min_freq = 5670
+min_freq = 5640
 max_freq = 5830
 
 # Get all unique frequencies sorted and filtered by range
