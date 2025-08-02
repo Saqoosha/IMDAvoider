@@ -143,6 +143,17 @@ Key findings:
 - Power growth: 2nd order at 2:1 ratio, 3rd order at 3:1 ratio
 - Indoor environments amplify 3rd order effects due to reflections
 
+### Real-World Validation Case
+
+A reported interference case perfectly validates our IMD model:
+- **Frequencies used**: R2(5695), A8(5725), B4(5790), F5(5820)
+- **Problem**: B4 channel experienced video interference
+- **Root cause**: 3-wave IMD: 5820 - 5725 + 5695 = 5790 MHz (exactly B4!)
+- **IMDAvoider rating**: 98 points (high score, but direct IMD hit on B4)
+- **Solution**: Change B4→A5(5785) reduces direct IMD impact
+
+This confirms that even high-rated combinations can have problems when IMD products directly hit a channel frequency.
+
 ### Future Considerations
 
 1. **Higher Order IMD**: Could add 4th and 5th order calculations for extreme accuracy
