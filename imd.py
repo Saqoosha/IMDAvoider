@@ -145,9 +145,9 @@ def calculate_weighted_interference(imd_freq: int, frequencies: list, weight: fl
     
     # Special penalty for direct hits or very close IMD products
     if difference <= 5:  # Within 5 MHz is considered a direct hit
-        # Catastrophic penalty: treat as 100x worse than normal
+        # Catastrophic penalty: treat as 200x worse than normal
         base_penalty = (threshold - difference) ** 2 * weight
-        return base_penalty * 100
+        return base_penalty * 200
     
     value = threshold - difference
     return value * value * weight
