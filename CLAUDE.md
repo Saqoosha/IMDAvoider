@@ -150,9 +150,8 @@ A reported interference case perfectly validates our IMD model:
 - **Problem**: B4 channel experienced video interference
 - **Root cause**: 3-wave IMD: 5820 - 5725 + 5695 = 5790 MHz (exactly B4!)
 - **IMDAvoider rating**: 98 points (high score, but direct IMD hit on B4)
-- **Solution**: Change B4→A5(5785) reduces direct IMD impact
 
-This confirms that even high-rated combinations can have problems when IMD products directly hit a channel frequency.
+This confirms that even high-rated combinations can have problems when IMD products directly hit a channel frequency. After fixing the algorithm, this problematic combination now correctly receives a lower rating.
 
 ### Future Considerations
 
