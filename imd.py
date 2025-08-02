@@ -4,9 +4,19 @@ RATING_MAX_VALUE = 100
 RATING_DIFF_LIMIT = 35
 
 # Weighting factors for different IMD orders (based on typical signal strengths)
-WEIGHT_2ND_ORDER = 1.0      # Reference level
-WEIGHT_3RD_ORDER_2FREQ = 0.1  # -20dB relative to 2nd order
-WEIGHT_3RD_ORDER_3FREQ = 0.03  # -30dB relative to 2nd order
+def db_to_linear(db):
+    """Convert dB value to linear scale"""
+    return 10 ** (db / 10)
+
+# Weight values in dB relative to 2nd order IMD
+WEIGHT_2ND_ORDER_DB = 0       # Reference level (0 dB)
+WEIGHT_3RD_ORDER_2FREQ_DB = -20  # -20dB relative to 2nd order
+WEIGHT_3RD_ORDER_3FREQ_DB = -30  # -30dB relative to 2nd order
+
+# Convert to linear weights
+WEIGHT_2ND_ORDER = db_to_linear(WEIGHT_2ND_ORDER_DB)      # 1.0
+WEIGHT_3RD_ORDER_2FREQ = db_to_linear(WEIGHT_3RD_ORDER_2FREQ_DB)  # 0.01
+WEIGHT_3RD_ORDER_3FREQ = db_to_linear(WEIGHT_3RD_ORDER_3FREQ_DB)  # 0.001
 
 # Different thresholds for different IMD types
 THRESHOLD_2ND_ORDER = 35  # Original threshold
@@ -132,6 +142,12 @@ def calculate_weighted_interference(imd_freq: int, frequencies: list, weight: fl
     
     if difference > threshold:
         return 0
+    
+    # Special penalty for direct hits or very close IMD products
+    if difference <= 5:  # Within 5 MHz is considered a direct hit
+        # Catastrophic penalty: treat as 200x worse than normal
+        base_penalty = (threshold - difference) ** 2 * weight
+        return base_penalty * 200
     
     value = threshold - difference
     return value * value * weight
